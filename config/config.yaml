@@ -1,0 +1,108 @@
+# Security Log Analyzer Configuration
+
+elasticsearch:
+  hosts: ["localhost:9200"]
+  username: "elastic"
+  password: "${ES_PASSWORD}"  # Set via environment variable
+  index_prefix: "security_logs"
+  ssl_verify: true
+
+postgresql:
+  host: "localhost"
+  port: 5432
+  database: "security_analyzer"
+  user: "postgres"
+  password: "${PG_PASSWORD}"  # Set via environment variable
+  ssl_mode: "prefer"
+
+redis:
+  host: "localhost"
+  port: 6379
+  password: "${REDIS_PASSWORD}"  # Set via environment variable
+  db: 0
+
+ingestion:
+  supported_formats:
+    - name: "syslog"
+      pattern: "%{SYSLOGTIMESTAMP:timestamp} %{SYSLOGHOST:hostname} %{DATA:program}(?:\[%{POSINT:pid}\])?: %{GREEDYDATA:message}"
+    - name: "windows_event"
+      enabled: true
+      hosts: []  # List of Windows hosts to collect from
+    - name: "apache"
+      pattern: '%{COMBINEDAPACHELOG}'
+    - name: "nginx"
+      pattern: '%{NGINXACCESS}'
+  batch_size: 1000
+  polling_interval: 5  # seconds
+  max_retries: 3
+
+analysis:
+  rules:
+    - name: "sql_injection"
+      pattern: "(?i)(union\\s+select|insert\\s+into|delete\\s+from|drop\\s+table)"
+      severity: "high"
+    - name: "brute_force"
+      conditions:
+        threshold: 5
+        timeframe: 300  # seconds
+        field: "auth_failure"
+      severity: "high"
+  anomaly_detection:
+    enabled: true
+    baseline_period: 7  # days
+    threshold: 2.5  # standard deviations
+  ip_reputation:
+    enabled: true
+    update_interval: 86400  # 24 hours
+    sources:
+      - "abuseipdb"
+      - "emergingthreats"
+
+visualization:
+  refresh_interval: 30  # seconds
+  retention_period: 30  # days
+  max_points: 1000
+  default_timeframe: "24h"
+
+alerts:
+  channels:
+    email:
+      enabled: true
+      smtp_server: "smtp.gmail.com"
+      smtp_port: 587
+      username: "${SMTP_USERNAME}"
+      password: "${SMTP_PASSWORD}"
+    slack:
+      enabled: true
+      webhook_url: "${SLACK_WEBHOOK_URL}"
+    sms:
+      enabled: false
+      provider: "twilio"
+      account_sid: "${TWILIO_ACCOUNT_SID}"
+      auth_token: "${TWILIO_AUTH_TOKEN}"
+  aggregation:
+    window: 300  # seconds
+    max_alerts: 10  # max alerts per window
+  severity_levels:
+    - name: "low"
+      color: "#92c353"
+    - name: "medium"
+      color: "#f0a500"
+    - name: "high"
+      color: "#c1121f"
+    - name: "critical"
+      color: "#780000"
+
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "logs/security_analyzer.log"
+  max_size: 10485760  # 10MB
+  backup_count: 5
+
+security:
+  jwt_secret: "${JWT_SECRET}"
+  token_expiration: 3600  # seconds
+  password_min_length: 12
+  failed_login_limit: 5
+  lockout_duration: 900  # seconds 

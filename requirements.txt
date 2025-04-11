@@ -1,0 +1,43 @@
+# Core dependencies
+elasticsearch==8.12.0
+elasticsearch-dsl==8.12.0
+psycopg2-binary==2.9.9
+redis==5.0.1
+fastapi==0.109.0
+uvicorn==0.27.0
+python-jose==3.3.0
+passlib==1.7.4
+python-multipart==0.0.6
+
+# Log processing
+python-json-logger==2.0.7
+pywinrm==0.4.3  # For Windows Event Log
+paramiko==3.4.0  # For secure log collection
+python-geoip==1.2
+maxminddb-geolite2==2018.703
+
+# Analysis and ML
+pandas==2.2.0
+numpy==1.26.3
+scikit-learn==1.4.0
+statsmodels==0.14.1
+
+# Visualization
+plotly==5.18.0
+dash==2.14.2
+
+# Async support
+aiohttp==3.9.1
+asyncio==3.4.3
+
+# Notification
+slackclient==2.9.4
+sendgrid==6.10.0
+
+# Container support
+docker==7.0.0
+kubernetes==29.0.0
+
+# Testing
+pytest==7.4.4
+pytest-asyncio==0.23.4 
