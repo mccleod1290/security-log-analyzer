@@ -52,7 +52,7 @@ A comprehensive security log analysis platform that provides real-time monitorin
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/security_log_analyzer.git
+git clone https://github.com/mccleod1290/security_log_analyzer.git
 cd security_log_analyzer
 ```
 
